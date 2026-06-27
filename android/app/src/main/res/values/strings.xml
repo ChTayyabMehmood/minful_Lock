@@ -50,6 +50,9 @@
     <string name="app_paused_restriction_app_active_period">App active period</string>
     <string name="app_paused_restriction_group_timer">Group timer</string>
     <string name="app_paused_restriction_group_active_period">Group active period</string>
+    <string name="app_paused_restriction_turkey_mode">Turkey mode</string>
+
+    <string name="app_paused_reason_turkey_mode">Digital detox is active! This app is blocked because it\'s not in your whitelist. Stay focused and enjoy the break from distractions.</string>
 
     <string name="app_paused_overlay_button_emergency">Emergency</string>
     <string name="app_paused_overlay_label_spent_today">Spent today</string>
