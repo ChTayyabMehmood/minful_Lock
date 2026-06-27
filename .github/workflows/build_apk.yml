@@ -27,6 +27,11 @@ jobs:
           channel: "stable"
           cache: true
 
+      - name: Flutter diagnostics
+        run: |
+          flutter --version
+          flutter doctor -v
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -34,9 +39,32 @@ jobs:
         run: dart run build_runner build -d
 
       - name: Build APK
-        run: flutter build apk --debug
+        id: build_apk
+        continue-on-error: true
+        run: |
+          flutter build apk --debug --android-skip-build-dependency-validation -v 2>&1 | tee flutter_build_apk.log
+
+      - name: Gradle stacktrace on failure
+        if: steps.build_apk.outcome == 'failure'
+        run: |
+          cd android
+          ./gradlew app:assembleDebug --stacktrace --info --no-daemon 2>&1 | tee ../gradle_assemble_debug.log
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mindful-build-logs
+          path: |
+            flutter_build_apk.log
+            gradle_assemble_debug.log
+
+      - name: Fail if build failed
+        if: steps.build_apk.outcome == 'failure'
+        run: exit 1
 
       - name: Upload APK
+        if: steps.build_apk.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: mindful-debug-apk
