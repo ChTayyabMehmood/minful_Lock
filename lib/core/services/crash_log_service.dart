@@ -50,17 +50,19 @@ class CrashLogService {
 
   /// Create a [CrashLog] object from the provided information and stores it in the database
   void recordCrashError(String error, String stackTrace) async {
-    /// Create log
-    final crashLog = CrashLogsTableCompanion.insert(
-      appVersion:
-          Value(MethodChannelService.instance.deviceInfo.mindfulVersion),
-      error: Value(error),
-      stackTrace: Value(stackTrace),
-      timeStamp: Value(DateTime.now()),
-    );
+    try {
+      /// Create log
+      final crashLog = CrashLogsTableCompanion.insert(
+        appVersion:
+            Value(MethodChannelService.instance.deviceInfo.mindfulVersion),
+        error: Value(error),
+        stackTrace: Value(stackTrace),
+        timeStamp: Value(DateTime.now()),
+      );
 
-    /// Insert log to database
-    await DriftDbService.instance.driftDb.dynamicRecordsDao
-        .insertCrashLog(crashLog);
+      /// Insert log to database
+      await DriftDbService.instance.driftDb.dynamicRecordsDao
+          .insertCrashLog(crashLog);
+    } catch (_) {}
   }
 }

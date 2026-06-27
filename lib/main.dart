@@ -30,8 +30,17 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   /// Initialize method channel and drift Database
-  await MethodChannelService.instance.init();
-  await DriftDbService.instance.init();
+  try {
+    await MethodChannelService.instance.init();
+  } catch (e, s) {
+    debugPrint("Failed to init MethodChannelService: $e\n$s");
+  }
+
+  try {
+    await DriftDbService.instance.init();
+  } catch (e, s) {
+    debugPrint("Failed to init DriftDbService: $e\n$s");
+  }
 
   FlutterError.onError = (errorDetails) {
     CrashLogService.instance.recordCrashError(

@@ -118,8 +118,12 @@ class AppDatabase extends _$AppDatabase {
 
           // v9 to v10: create turkey mode tables
           if (from <= 9 && to >= 10) {
-            await m.createTable(turkeyModeTable);
-            await m.createTable(turkeyModeSessionsTable);
+            try {
+              await m.createTable(turkeyModeTable);
+              await m.createTable(turkeyModeSessionsTable);
+            } catch (e) {
+              debugPrint("Turkey mode tables migration (v9->v10) failed: $e");
+            }
           }
         },
       );

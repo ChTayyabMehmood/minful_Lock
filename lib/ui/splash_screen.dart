@@ -11,6 +11,7 @@
 import 'dart:math';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -49,24 +50,31 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   void _checkOnboardingAndPerms() async {
-    final perms =
-        await ref.read(permissionProvider.notifier).fetchPermissionsStatus();
+    try {
+      final perms =
+          await ref.read(permissionProvider.notifier).fetchPermissionsStatus();
 
-    final settings = await ref.read(mindfulSettingsProvider.notifier).init();
-    _isOnboardingDone = settings.isOnboardingDone;
-    _isAppUpdated = settings.appVersion !=
-        MethodChannelService.instance.deviceInfo.mindfulVersion;
+      final settings = await ref.read(mindfulSettingsProvider.notifier).init();
+      _isOnboardingDone = settings.isOnboardingDone;
+      _isAppUpdated = settings.appVersion !=
+          MethodChannelService.instance.deviceInfo.mindfulVersion;
 
-    _isAccessProtected =
-        (await ref.read(parentalControlsProvider.notifier).init())
-            .protectedAccess;
-    _haveAllEssentialPermissions = perms.haveUsageAccessPermission &&
-        perms.haveDisplayOverlayPermission &&
-        perms.haveAlarmsPermission &&
-        perms.haveNotificationPermission;
+      _isAccessProtected =
+          (await ref.read(parentalControlsProvider.notifier).init())
+              .protectedAccess;
+      _haveAllEssentialPermissions = perms.haveUsageAccessPermission &&
+          perms.haveDisplayOverlayPermission &&
+          perms.haveAlarmsPermission &&
+          perms.haveNotificationPermission;
 
-    if (mounted) setState(() {});
-    _isAccessProtected ? _authenticate() : _goToNextScreen(true);
+      if (mounted) setState(() {});
+      _isAccessProtected ? _authenticate() : _goToNextScreen(true);
+    } catch (e, s) {
+      debugPrint("SplashScreen init failed: $e\n$s");
+      if (mounted) {
+        _goToNextScreen(true);
+      }
+    }
   }
 
   void _goToNextScreen(bool shouldDelay) async {
@@ -89,12 +97,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     /// Return if not mounted
     if (!mounted) return;
 
-    /// If removed locks
+    /// If no biometrics available, proceed without auth
     if (isAuthenticated == null) {
-      context.showSnackAlert(
-        context.locale.protected_access_removed_lock_snack_alert,
-        icon: FluentIcons.fingerprint_20_filled,
-      );
+      _goToNextScreen(false);
       return;
     }
 

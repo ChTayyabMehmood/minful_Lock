@@ -8,68 +8,72 @@ class Initializer {
   ///
   /// This method must be called after initializing `DATABASE` and `METHOD CHANNEL`.
   static Future<void> initializeServicesAndSchedules() async {
-    final startTimeStamp = DateTime.now();
+    try {
+      final startTimeStamp = DateTime.now();
 
-    final dynamicDao = DriftDbService.instance.driftDb.dynamicRecordsDao;
-    final uniqueDao = DriftDbService.instance.driftDb.uniqueRecordsDao;
+      final dynamicDao = DriftDbService.instance.driftDb.dynamicRecordsDao;
+      final uniqueDao = DriftDbService.instance.driftDb.uniqueRecordsDao;
 
-    /// fetch app restrictions
-    var appRestrictions = await dynamicDao.fetchAppsRestrictions();
-    final internetBlockedApps = appRestrictions
-        .where((e) => !e.canAccessInternet)
-        .map((e) => e.appPackage)
-        .toList();
+      /// fetch app restrictions
+      var appRestrictions = await dynamicDao.fetchAppsRestrictions();
+      final internetBlockedApps = appRestrictions
+          .where((e) => !e.canAccessInternet)
+          .map((e) => e.appPackage)
+          .toList();
 
-    /// filter out restrictions
-    appRestrictions.removeWhere(
-      (e) =>
-          e.timerSec <= 0 &&
-          e.periodDurationInMins <= 0 &&
-          e.launchLimit <= 0 &&
-          e.associatedGroupId == null,
-    );
+      /// filter out restrictions
+      appRestrictions.removeWhere(
+        (e) =>
+            e.timerSec <= 0 &&
+            e.periodDurationInMins <= 0 &&
+            e.launchLimit <= 0 &&
+            e.associatedGroupId == null,
+      );
 
-    /// update tracker service
-    await MethodChannelService.instance.updateAppRestrictions(appRestrictions);
+      /// update tracker service
+      await MethodChannelService.instance.updateAppRestrictions(appRestrictions);
 
-    /// update vpn service
-    await MethodChannelService.instance
-        .updateInternetBlockedApps(internetBlockedApps);
-
-    /// Update restriction groups
-    final restrictionGroups = await dynamicDao.fetchRestrictionGroups();
-    await MethodChannelService.instance
-        .updateRestrictionsGroups(restrictionGroups);
-
-    /// Fetch and update bedtime routine
-    final bedtime = await uniqueDao.loadBedtimeSchedule();
-    await MethodChannelService.instance.updateBedtimeSchedule(bedtime);
-
-    /// Fetch and update wellbeing
-    final wellbeing = await uniqueDao.loadWellBeingSettings();
-    await MethodChannelService.instance.updateWellBeingSettings(wellbeing);
-
-    /// Fetch and update notification settings
-    final notificationSettings = await uniqueDao.loadNotificationSettings();
-    await MethodChannelService.instance
-        .updateNotificationSettings(notificationSettings);
-
-    /// Fetch and update turkey mode
-    final turkeyMode = await uniqueDao.loadTurkeyMode();
-
-    // Push passphrase hash to native if set
-    if (turkeyMode.unlockToken.isNotEmpty) {
+      /// update vpn service
       await MethodChannelService.instance
-          .storePassphraseHashDirectly(turkeyMode.unlockToken);
-    }
+          .updateInternetBlockedApps(internetBlockedApps);
 
-    if (turkeyMode.isEnabled && turkeyMode.whitelistedApps.isNotEmpty) {
+      /// Update restriction groups
+      final restrictionGroups = await dynamicDao.fetchRestrictionGroups();
       await MethodChannelService.instance
-          .updateTurkeyModeApps(turkeyMode.whitelistedApps);
-    }
+          .updateRestrictionsGroups(restrictionGroups);
 
-    debugPrint(
-      "All necessary services and schedules are initialized and it took ${DateTime.now().difference(startTimeStamp).inMilliseconds}ms.",
-    );
+      /// Fetch and update bedtime routine
+      final bedtime = await uniqueDao.loadBedtimeSchedule();
+      await MethodChannelService.instance.updateBedtimeSchedule(bedtime);
+
+      /// Fetch and update wellbeing
+      final wellbeing = await uniqueDao.loadWellBeingSettings();
+      await MethodChannelService.instance.updateWellBeingSettings(wellbeing);
+
+      /// Fetch and update notification settings
+      final notificationSettings = await uniqueDao.loadNotificationSettings();
+      await MethodChannelService.instance
+          .updateNotificationSettings(notificationSettings);
+
+      /// Fetch and update turkey mode
+      final turkeyMode = await uniqueDao.loadTurkeyMode();
+
+      // Push passphrase hash to native if set
+      if (turkeyMode.unlockToken.isNotEmpty) {
+        await MethodChannelService.instance
+            .storePassphraseHashDirectly(turkeyMode.unlockToken);
+      }
+
+      if (turkeyMode.isEnabled && turkeyMode.whitelistedApps.isNotEmpty) {
+        await MethodChannelService.instance
+            .updateTurkeyModeApps(turkeyMode.whitelistedApps);
+      }
+
+      debugPrint(
+        "All necessary services and schedules are initialized and it took ${DateTime.now().difference(startTimeStamp).inMilliseconds}ms.",
+      );
+    } catch (e, s) {
+      debugPrint("Failed to initialize services and schedules: $e\n$s");
+    }
   }
 }

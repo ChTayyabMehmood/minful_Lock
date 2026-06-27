@@ -8,6 +8,7 @@
  *
  */
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,31 +35,36 @@ class PermissionNotifier extends StateNotifier<PermissionsModel>
 
   /// Create [PermissionsModel] and initializes with permission state by fetching initial permission status then updated state.
   Future<PermissionsModel> fetchPermissionsStatus() async {
-    final cache = PermissionsModel(
-      haveNotificationPermission:
-          await MethodChannelService.instance.getAndAskNotificationPermission(),
-      haveUsageAccessPermission:
-          await MethodChannelService.instance.getAndAskUsageAccessPermission(),
-      haveDisplayOverlayPermission: await MethodChannelService.instance
-          .getAndAskDisplayOverlayPermission(),
-      haveDndPermission:
-          await MethodChannelService.instance.getAndAskDndPermission(),
-      haveAccessibilityPermission: await MethodChannelService.instance
-          .getAndAskAccessibilityPermission(),
-      haveVpnPermission:
-          await MethodChannelService.instance.getAndAskVpnPermission(),
-      haveAlarmsPermission:
-          await MethodChannelService.instance.getAndAskExactAlarmPermission(),
-      haveIgnoreOptimizationPermission: await MethodChannelService.instance
-          .getAndAskIgnoreBatteryOptimizationPermission(),
-      haveAdminPermission:
-          await MethodChannelService.instance.getAndAskAdminPermission(),
-      haveNotificationAccessPermission: await MethodChannelService.instance
-          .getAndAskNotificationAccessPermission(),
-    );
+    try {
+      final cache = PermissionsModel(
+        haveNotificationPermission:
+            await MethodChannelService.instance.getAndAskNotificationPermission(),
+        haveUsageAccessPermission:
+            await MethodChannelService.instance.getAndAskUsageAccessPermission(),
+        haveDisplayOverlayPermission: await MethodChannelService.instance
+            .getAndAskDisplayOverlayPermission(),
+        haveDndPermission:
+            await MethodChannelService.instance.getAndAskDndPermission(),
+        haveAccessibilityPermission: await MethodChannelService.instance
+            .getAndAskAccessibilityPermission(),
+        haveVpnPermission:
+            await MethodChannelService.instance.getAndAskVpnPermission(),
+        haveAlarmsPermission:
+            await MethodChannelService.instance.getAndAskExactAlarmPermission(),
+        haveIgnoreOptimizationPermission: await MethodChannelService.instance
+            .getAndAskIgnoreBatteryOptimizationPermission(),
+        haveAdminPermission:
+            await MethodChannelService.instance.getAndAskAdminPermission(),
+        haveNotificationAccessPermission: await MethodChannelService.instance
+            .getAndAskNotificationAccessPermission(),
+      );
 
-    state = cache;
-    return cache;
+      state = cache;
+      return cache;
+    } catch (e) {
+      debugPrint("Failed to fetch permissions status: $e");
+      return state;
+    }
   }
 
   /// Removes the lifecycle observer when the widget is disposed.
