@@ -591,7 +591,7 @@ class _TurkeyModeScreenState extends ConsumerState<TurkeyModeScreen> {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(FluentIcons.fluent_20_filled, size: 16),
+                const Icon(FluentIcons.fire_20_filled, size: 16),
                 4.hBox,
                 StyledText(
                   'Streak: ${turkeyMode.currentStreak} days | Best: ${turkeyMode.longestStreak} days',
