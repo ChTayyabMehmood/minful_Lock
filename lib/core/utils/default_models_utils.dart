@@ -114,7 +114,7 @@ const defaultFocusProfileModel = FocusProfile(
   distractingApps: [],
 );
 
-const defaultTurkeyModeModel = TurkeyMode(
+final defaultTurkeyModeModel = TurkeyMode(
   id: 0,
   isEnabled: false,
   isSessionBased: false,

@@ -98,21 +98,29 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (m, from, to) async {
           debugPrint("Upgrading database from schema version $from to $to");
 
-          return m.runMigrationSteps(
-            from: from,
-            to: to,
-            steps: migrationSteps(
-              from1To2: from1To2,
-              from2To3: from2To3,
-              from3To4: from3To4,
-              from4To5: from4To5,
-              from5To6: from5To6,
-              from6To7: from6To7,
-              from7To8: from7To8,
-              from8To9: from8To9,
-              from9To10: from9To10,
-            ),
-          );
+          // Run existing migrations up to v9
+          if (from < to && from <= 9) {
+            await m.runMigrationSteps(
+              from: from,
+              to: to > 9 ? 9 : to,
+              steps: migrationSteps(
+                from1To2: from1To2,
+                from2To3: from2To3,
+                from3To4: from3To4,
+                from4To5: from4To5,
+                from5To6: from5To6,
+                from6To7: from6To7,
+                from7To8: from7To8,
+                from8To9: from8To9,
+              ),
+            );
+          }
+
+          // v9 to v10: create turkey mode tables
+          if (from <= 9 && to >= 10) {
+            await m.createTable(turkeyModeTable);
+            await m.createTable(turkeyModeSessionsTable);
+          }
         },
       );
 }

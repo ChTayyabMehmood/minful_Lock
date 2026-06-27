@@ -24,11 +24,11 @@ class TurkeyModeSessionsTable extends Table {
 
   /// When the session started
   DateTimeColumn get startDateTime =>
-      dateTime().withDefault(const Constant(DateTime(0)))();
+      dateTime().withDefault(Constant(DateTime(0)))();
 
   /// When the session ended (0 if still active)
   DateTimeColumn get endDateTime =>
-      dateTime().withDefault(const Constant(DateTime(0)))();
+      dateTime().withDefault(Constant(DateTime(0)))();
 
   /// Duration in seconds
   IntColumn get durationSecs => integer().withDefault(const Constant(0))();

@@ -2,6 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mindful/core/database/app_database.dart';
 import 'package:mindful/core/extensions/ext_build_context.dart';
 import 'package:mindful/core/extensions/ext_num.dart';
 import 'package:mindful/core/services/method_channel_service.dart';
@@ -371,7 +372,7 @@ class _TurkeyModeScreenState extends ConsumerState<TurkeyModeScreen> {
                               children: [
                                 Row(
                                   children: [
-                                    const Icon(FluentIcons.command_line_20_regular,
+                                    const Icon(FluentIcons.lock_closed_20_regular,
                                         size: 16),
                                     4.hBox,
                                     const StyledText(
@@ -491,7 +492,7 @@ class _TurkeyModeScreenState extends ConsumerState<TurkeyModeScreen> {
                               fit: BoxFit.cover,
                             ),
                           )
-                        : const Icon(FluentIcons.app_20_regular, size: 40),
+                        : const Icon(FluentIcons.phone_20_regular, size: 40),
                     titleText: app.name,
                     subtitleText: app.packageName,
                     trailing: Icon(

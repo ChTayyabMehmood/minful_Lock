@@ -34,7 +34,7 @@ class TurkeyModeTable extends Table {
 
   /// When the current session started
   DateTimeColumn get sessionStartDateTime =>
-      dateTime().withDefault(const Constant(DateTime(0)))();
+      dateTime().withDefault(Constant(DateTime(0)))();
 
   /// List of whitelisted app package names (only these apps are allowed)
   TextColumn get whitelistedApps => text()
@@ -60,5 +60,5 @@ class TurkeyModeTable extends Table {
 
   /// Last date the streak was updated
   DateTimeColumn get lastTimeStreakUpdated =>
-      dateTime().withDefault(const Constant(DateTime(0)))();
+      dateTime().withDefault(Constant(DateTime(0)))();
 }
