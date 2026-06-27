@@ -57,11 +57,11 @@ class TurkeyModeService : Service() {
             Utils.isServiceRunning(context, TurkeyModeService::class.java)
     }
 
-    override fun onBind(intent: Intent?): IBinder {
+    override fun onBind(intent: Intent): IBinder? {
         return if (intent?.action == ServiceBinder.ACTION_BIND_TO_MINDFUL) {
             binder
         } else {
-            super.onBind(intent)
+            null
         }
     }
 
